@@ -58,10 +58,21 @@ export default function Home() {
       </div>
 
         {address ? <>
-        
-         <input type="text" />
-         <input type='number' />
-         <input type='time' />
+
+          {/* form is supposed to look bad rn */}
+         <label className='block'>
+          <div>Profile ID</div>
+          <input type="number"/> 
+         </label>
+         <label className='block'>
+          <div>Publication ID</div>
+          <input type="number"/> 
+         </label>
+         <label className='block'>
+          <div>Raffle Time</div>
+          <input type='date' />
+          <input type='time' />
+         </label>
          <button className='mt-10 bg-green-700 text-white rounded-xl p-2' onClick={() => handleGiveaway(raffleData)}>Create Raffle</button>
 
 
