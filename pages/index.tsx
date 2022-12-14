@@ -1,22 +1,29 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
-import { client, exploreProfiles } from '../api'
+import { client, getProfile } from '../lib/lensApi/api'
 // import styles from '../styles/Home.module.css'
 import { useConnectWallet } from '@web3-onboard/react'
+
+
+
+
 
 export default function Home() {
   const [profiles, setProfiles] = useState<Array<{[property: string]: any}>>([])
   const [{ wallet, connecting }, connect, disconnect] = useConnectWallet()
+  const [address, setAddress] = useState<string | undefined>("")
+
+
+
+  useEffect(() => setAddress(wallet?.accounts[0].address), [wallet])
 
   useEffect(() => {
-    async function fetchProfiles() {
-      const response = await client.query({ query: exploreProfiles })
-      console.log(response.data.exploreProfiles.items)
-      setProfiles(response.data.exploreProfiles.items)
-      }
-      fetchProfiles()
-  }, [])
+    async function effectCall() {
+    const profiles = address ? await getProfile(address) : undefined;
+    }
+    effectCall()
+  }, [address])
 
   return (
     <div className='container pt-10 text-center'>

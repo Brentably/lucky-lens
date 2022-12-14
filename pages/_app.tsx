@@ -9,7 +9,7 @@ const rpcUrl = 'https://polygon-mumbai.g.alchemy.com/v2/LlPfIiQ_9R3vvvqY5HOadGN6
 
 const injected = injectedModule()
 const walletConnect = walletConnectModule()
-const web3onboard = init({
+const web3Onboard = init({
   wallets: [injected, walletConnect],
   chains: [
     {
@@ -23,5 +23,9 @@ const web3onboard = init({
 
 
 export default function App({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />
+  return ( 
+  <Web3OnboardProvider web3Onboard={web3Onboard}>
+    <Component {...pageProps} /> 
+  </Web3OnboardProvider>
+  )
 }
