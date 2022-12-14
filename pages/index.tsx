@@ -4,13 +4,14 @@ import { useEffect, useState } from 'react'
 import { client, getProfile } from '../lib/lensApi/api'
 // import styles from '../styles/Home.module.css'
 import { useConnectWallet } from '@web3-onboard/react'
+import { ProfileFieldsFragment } from '../lib/lensApi/generated'
 
 
 
 
 
 export default function Home() {
-  const [profiles, setProfiles] = useState<Array<{[property: string]: any}>>([])
+  const [profile, setProfile] = useState<ProfileFieldsFragment | null>(null)
   const [{ wallet, connecting }, connect, disconnect] = useConnectWallet()
   const [address, setAddress] = useState<string | undefined>("")
 
@@ -20,7 +21,8 @@ export default function Home() {
 
   useEffect(() => {
     async function effectCall() {
-    const profiles = address ? await getProfile(address) : undefined;
+    const profile:(ProfileFieldsFragment | null) = address ? await getProfile(address) : null;
+    setProfile(profile)
     }
     effectCall()
   }, [address])
