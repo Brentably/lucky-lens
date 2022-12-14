@@ -6,6 +6,7 @@ import { client, getProfile } from '../lib/lensApi/api'
 import { useConnectWallet } from '@web3-onboard/react'
 import { ProfileFieldsFragment } from '../lib/lensApi/generated'
 import { ethers } from 'ethers'
+import handleGiveaway from '../handlers/handleGiveaway'
 
 
 
@@ -16,6 +17,7 @@ export default function Home() {
   const [address, setAddress] = useState<string | undefined>("")
   const [provider, setProvider] = useState<ethers.providers.Web3Provider | null>(null)
   const [profile, setProfile] = useState<ProfileFieldsFragment | null>(null)
+  const [raffleData, setRaffleData] = useState<Record<string, unknown> | null>(null)
 
 
 
@@ -37,23 +39,37 @@ export default function Home() {
   }, [address])
 
   return (
-    <div className='main pt-10 text-center'>
+    <div className='pt-10 text-center h-screen'>
       <Head>
         <title>Create Next App</title>
         <meta name="Lucky lens" content="Lucky Lens is a way to verifiably randomly choose a winner for a giveaway" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <h1 className='text-4xl m-2'>Lucky Lens</h1>
-      <button className='bg-green-700 text-white rounded-xl p-2 mt-2 w-28' disabled={connecting} onClick={() => (wallet ? disconnect(wallet) : connect())}>
-        {connecting ? 'connecting' : wallet ? 'disconnect' : 'connect'}
-      </button>
-      {profile ? 
-        <div className='mt-20'>
-          {`Hello @${profile.handle}! Welcome to Lucky Lens :)`}
-        </div>
-      : null}
+      <div id="header">
+        <h1 className='text-4xl m-2'>Lucky Lens</h1>
+        <button className='bg-green-700 text-white rounded-xl p-2 mt-2 w-28' disabled={connecting} onClick={() => (wallet ? disconnect(wallet) : connect())}>
+          {connecting ? 'connecting' : wallet ? 'disconnect' : 'connect'}
+        </button>
+        {profile ?  // they don't actually need a lens profile to use the app, but it will probably be useful to have it in the future
+          <div className='mt-2'>
+            {`Hello @${profile.handle}! Welcome to Lucky Lens :)`}
+          </div>
+        : null}
+      </div>
 
-      
+        {address ? <>
+        
+         <input type="text" />
+         <input type='number' />
+         <input type='time' />
+         <button className='mt-10 bg-green-700 text-white rounded-xl p-2' onClick={() => handleGiveaway(raffleData)}>Create Raffle</button>
+
+
+
+
+         <div className='my-20'>Giveaways listed here</div>
+        </>: null}
+
     </div>
   )
 }
