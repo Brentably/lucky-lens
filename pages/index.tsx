@@ -6,10 +6,16 @@ import { client, getProfile } from '../lib/lensApi/api'
 import { useConnectWallet } from '@web3-onboard/react'
 import { ProfileFieldsFragment } from '../lib/lensApi/generated'
 import { ethers } from 'ethers'
-import handleGiveaway from '../handlers/handleGiveaway'
+import {handleNewRaffle} from '../helpers/handlers'
 
 
-
+type newRaffleData = {
+  profileId?: string,
+  pubId?: string,
+  date?: string,
+  time?: string,
+  now?: boolean
+}
 
 
 export default function Home() {
@@ -17,8 +23,8 @@ export default function Home() {
   const [address, setAddress] = useState<string | undefined>("")
   const [provider, setProvider] = useState<ethers.providers.Web3Provider | null>(null)
   const [profile, setProfile] = useState<ProfileFieldsFragment | null>(null)
-  const [raffleData, setRaffleData] = useState<Record<string, unknown> | null>(null)
-
+  const [newRaffleData, setNewRaffleData] = useState<newRaffleData | null>(null)
+  useEffect(() => console.log(newRaffleData), [newRaffleData])
 
 
   // updates address and provider based on web3Onboard's wallet
@@ -61,19 +67,25 @@ export default function Home() {
 
           {/* form is supposed to look bad rn */}
          <label className='block'>
-          <div>Profile ID</div>
-          <input type="number"/> 
+          <div>Profile ID (number)</div>
+          <input type="number" onChange={e => setNewRaffleData(prevState => ({...prevState, profileId: e.target.value}))}/> 
          </label>
          <label className='block'>
-          <div>Publication ID</div>
-          <input type="number"/> 
+          <div>Publication ID (number)</div>
+          <input type="number" onChange={e => setNewRaffleData(prevState => ({...prevState, pubId: e.target.value}))}/> 
          </label>
          <label className='block'>
           <div>Raffle Time</div>
-          <input type='date' />
-          <input type='time' />
+
+          Now?<input type="checkbox" className='m-3' checked={newRaffleData?.now} onChange={e => setNewRaffleData(prevState => ({...prevState, now: e.target.checked}))}/><br/>
+
+          {!newRaffleData?.now ? <>
+          <input type='date' value={newRaffleData?.date} onChange={e => setNewRaffleData(prevState => ({...prevState, date: e.target.value}))}/>
+          <input type='time' value={newRaffleData?.time} onChange={e => setNewRaffleData(prevState => ({...prevState, time: e.target.value}))}/>
+          </> : null}
+          {/* <button className='form-input bg-slate-300' onClick={() => setNewRaffleData(prevState => ({...prevState, date: "0", time: "0"}))}>now</button> */}
          </label>
-         <button className='mt-10 bg-green-700 text-white rounded-xl p-2' onClick={() => handleGiveaway(raffleData)}>Create Raffle</button>
+         <button className='mt-10 bg-green-700 text-white rounded-xl p-2' onClick={() => handleNewRaffle(newRaffleData)}>Create Raffle</button>
 
 
 
