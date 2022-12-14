@@ -1,4 +1,4 @@
-/** @type {import('next').NextConfig} */ // eslint-disable-line
+/** @type {import('next').NextConfig} */ 
 
 const nextConfig = {
   reactStrictMode: true,
