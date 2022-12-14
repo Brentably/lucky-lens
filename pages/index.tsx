@@ -38,6 +38,11 @@ export default function Home() {
       <button className='bg-green-700 text-white rounded-xl p-2 mt-2' disabled={connecting} onClick={() => (wallet ? disconnect(wallet) : connect())}>
         {connecting ? 'connecting' : wallet ? 'disconnect' : 'connect'}
       </button>
+      {profile ? 
+        <div className='mt-20'>
+          {`Hello @${profile.handle}! Welcome to Lucky Lens :)`}
+        </div>
+      : null}
     </div>
   )
 }
