@@ -3,13 +3,14 @@ import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { client, getProfile } from '../lib/lensApi/api'
 // import styles from '../styles/Home.module.css'
-import { useConnectWallet } from '@web3-onboard/react'
+import { useAppState, useConnectWallet } from '@web3-onboard/react'
 import { ProfileFieldsFragment } from '../lib/lensApi/generated'
-import { ethers } from 'ethers'
-import { getRaffles, LuckyLensMumbai } from '../lib/contracts/address'
+import { BigNumber, ethers } from 'ethers'
+import { getRaffles, LuckyLensMumbai } from '../lib/contracts/LuckyLens'
 import { Web3OnboardProvider, init } from '@web3-onboard/react'
 import injectedModule from '@web3-onboard/injected-wallets'
 import walletConnectModule from '@web3-onboard/walletconnect'
+import { Result } from '@ethersproject/abi/lib/interface'
 
 
 type newRaffleData = {
@@ -18,6 +19,13 @@ type newRaffleData = {
   date?: string,
   time?: string,
   now?: boolean
+}
+export type postedRaffle = {
+  owner: string,
+  profileId: string,
+  pubId: string,
+  raffleId: string,
+  time: string
 }
 
 
@@ -30,7 +38,8 @@ export default function Home() {
   const [profile, setProfile] = useState<ProfileFieldsFragment | null>(null)
   const [newRaffleData, setNewRaffleData] = useState<newRaffleData | null>(null)
   useEffect(() => console.log(newRaffleData), [newRaffleData])
-
+  const [raffles, setRaffles] = useState<postedRaffle[] | null>(null)
+  useEffect(() => console.log(raffles), [raffles])
 
   const handleNewRaffle = async () => {
     const {profileId, pubId, date, time, now} = newRaffleData!
@@ -77,6 +86,7 @@ export default function Home() {
       const profile:ProfileFieldsFragment = await getProfile(address)
       setProfile(profile)
       const rafflesForAddress:any[] = await getRaffles(address, provider)
+      setRaffles(rafflesForAddress)
     }
     effectCall()
   }, [address, provider])
@@ -84,7 +94,7 @@ export default function Home() {
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
   return (
-    <div className='pt-10 text-center h-screen'>
+    <div className='pt-10 text-center h-screen mx-auto max-w-3xl'>
       <Head>
         <title>Create Next App</title>
         <meta name="Lucky lens" content="Lucky Lens is a way to verifiably randomly choose a winner for a giveaway" />
@@ -104,38 +114,46 @@ export default function Home() {
 
         {address ? <>
 
-          {/* form is supposed to look bad rn */}
-        <div id="form" className='mt-4'>
-          <div className='font-semibold text-lg my-2'>Create a new raffle:</div>
+            {/* form is supposed to look bad rn */}
+          <div id="form" className='mt-4'>
+            <div className='font-semibold text-lg my-2'>Create a new raffle:</div>
 
-          <label className='block'>
-              <div className='font-medium'>Profile ID (number)</div>
-              <input type="number" onChange={e => setNewRaffleData(prevState => ({...prevState, profileId: e.target.value}))}/> 
-          </label>
-          <label className='block'>
-              <div className='font-medium'>Publication ID (number)</div>
-              <input type="number" onChange={e => setNewRaffleData(prevState => ({...prevState, pubId: e.target.value}))}/> 
-          </label>
-          <label className='block'>
-              <div className='font-medium'>Raffle Time</div>
+            <label className='block'>
+                <div className='font-medium'>Profile ID (number)</div>
+                <input type="number" onChange={e => setNewRaffleData(prevState => ({...prevState, profileId: e.target.value}))}/> 
+            </label>
+            <label className='block'>
+                <div className='font-medium'>Publication ID (number)</div>
+                <input type="number" onChange={e => setNewRaffleData(prevState => ({...prevState, pubId: e.target.value}))}/> 
+            </label>
+            <label className='block'>
+                <div className='font-medium'>Raffle Time</div>
 
-              Now?<input type="checkbox" className='m-3' checked={Boolean(newRaffleData?.now)} onChange={e => setNewRaffleData(prevState => ({...prevState, now: e.target.checked}))}/><br/>
+                Now?<input type="checkbox" className='m-3' checked={Boolean(newRaffleData?.now)} onChange={e => setNewRaffleData(prevState => ({...prevState, now: e.target.checked}))}/><br/>
 
-              {!newRaffleData?.now ? <>
-                <input type='date' value={newRaffleData?.date} onChange={e => setNewRaffleData(prevState => ({...prevState, date: e.target.value}))}/>
-                <input type='time' value={newRaffleData?.time} onChange={e => setNewRaffleData(prevState => ({...prevState, time: e.target.value}))}/>
-                <span className='ml-1'>{timezone}</span>
-              </> : null}
+                {!newRaffleData?.now ? <>
+                  <input type='date' value={newRaffleData?.date} onChange={e => setNewRaffleData(prevState => ({...prevState, date: e.target.value}))}/>
+                  <input type='time' value={newRaffleData?.time} onChange={e => setNewRaffleData(prevState => ({...prevState, time: e.target.value}))}/>
+                  <span className='ml-1'>{timezone}</span>
+                </> : null}
 
-          </label>
-          <button disabled={!newRaffleData} className='mt-2 bg-green-700 text-white rounded-xl p-2' onClick={handleNewRaffle}>Create Raffle</button>
-        </div>
+            </label>
+            <button disabled={!newRaffleData} className='mt-2 bg-green-700 text-white rounded-xl p-2' onClick={handleNewRaffle}>Create Raffle</button>
+          </div>
 
+          {raffles !== null ? <>
 
+          {raffles.length == 0 && <div className='my-20'>no raffles found</div>}
+          
+          <div className='max-w-lg mx-auto mt-2'>
+            {raffles.map(raffle => (
+            <div key={raffle.raffleId} className='bg-gray-400 border-black border-2 py-2'>
 
-         <div className='my-20'>Giveaways listed here</div>
+            profileId: {raffle.profileId}, pubId: {raffle.pubId}, raffleId: {raffle.raffleId}
 
-
+            </div>))}
+          </div>
+          </> : <div className='my-20'>loading raffles</div>}
         </>: null}
 
     </div>
