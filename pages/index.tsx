@@ -79,6 +79,7 @@ export default function Home() {
   }, [wallet])
 
   // gets lens profile from connected address
+
   useEffect(() => {
     if(!address) return
     async function effectCall() {
@@ -88,6 +89,7 @@ export default function Home() {
       const rafflesForAddress:any[] = await getRaffles(address, provider)
       setRaffles(rafflesForAddress)
     }
+
     effectCall()
   }, [address, provider])
 
