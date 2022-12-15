@@ -161,7 +161,7 @@ export default function Home() {
             {raffles.map(raffle => (
             <div key={raffle.raffleId} className='bg-gray-400 border-black border-2 py-2'>
 
-            profileId: {raffle.profileId}, pubId: {raffle.pubId}, raffleId: {raffle.raffleId}
+            profileId: {raffle.profileId}, pubId: {raffle.pubId}, raffleId: {raffle.raffleId}, time: {raffle.time}
 
             </div>))}
           </div>
