@@ -57,6 +57,7 @@ export default function Home() {
 
   // updates address, provider, signer based on web3Onboard's wallet
   useEffect(() => {
+    if(wallet === null) return
     setAddress(wallet?.accounts[0].address)
     const provider = wallet ? new ethers.providers.Web3Provider(wallet.provider, 'any') : null
     provider ? setProvider(provider) : console.log('ooops, couldnt get provider. provider is', provider)
@@ -67,6 +68,7 @@ export default function Home() {
 
   // gets lens profile from connected address
   useEffect(() => {
+    if(address === "") return
     async function effectCall() {
     const profile:(ProfileFieldsFragment | null) = address ? await getProfile(address) : null;
     setProfile(profile)
