@@ -67,14 +67,14 @@ export default function Home() {
   }, [wallet])
 
   // gets lens profile from connected address
-  useEffect(() => {
-    if(address === "") return
-    async function effectCall() {
-    const profile:(ProfileFieldsFragment | null) = address ? await getProfile(address) : null;
-    setProfile(profile)
-    }
-    effectCall()
-  }, [address])
+  // useEffect(() => {
+  //   if(address === "") return
+  //   async function effectCall() {
+  //   // const profile:(ProfileFieldsFragment | null) = address ? await getProfile(address) : null;
+  //   setProfile(profile)
+  //   }
+  //   effectCall()
+  // }, [address])
 
   // const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
   // const some =  Date.now()
