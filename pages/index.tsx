@@ -10,8 +10,6 @@ import { LuckyLensMumbai } from '../lib/contracts/address'
 import { Web3OnboardProvider, init } from '@web3-onboard/react'
 import injectedModule from '@web3-onboard/injected-wallets'
 import walletConnectModule from '@web3-onboard/walletconnect'
-import { NextPage } from 'next'
-import { Props, ScriptProps } from 'next/script'
 
 
 export type newRaffleData = {
@@ -23,23 +21,8 @@ export type newRaffleData = {
 }
 
 
-const rpcUrl = 'https://polygon-mumbai.g.alchemy.com/v2/LlPfIiQ_9R3vvvqY5HOadGN68ej0_I9z'
 
-const injected = injectedModule()
-const walletConnect = walletConnectModule()
-const web3Onboard = init({
-  wallets: [injected, walletConnect],
-  chains: [
-    {
-      id: 80001,
-      token: 'MATIC',
-      label: 'Polygon Mumbai',
-      rpcUrl
-    }
-  ]
-})
-
-const Home:NextPage<ScriptProps> = ()=> {
+export default function Home() {
   const [{ wallet, connecting }, connect, disconnect] = useConnectWallet()
   const [address, setAddress] = useState<string | undefined>("")
   const [provider, setProvider] = useState<ethers.providers.Web3Provider | null>(null)
@@ -150,5 +133,3 @@ const Home:NextPage<ScriptProps> = ()=> {
     </div>
   )
 }
-
-export default Home
