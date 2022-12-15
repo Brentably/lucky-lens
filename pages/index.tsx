@@ -37,16 +37,16 @@ export default function Home() {
     if(!profileId || !pubId) console.error('tried to create new Raffle without params')
     if(!(date && time) && !now) console.error('tried to create new Raffle without params')
     console.log("new giveaway with newRaffleData:", newRaffleData)
-    // const LuckyLens = LuckyLensMumbai.connect(signer!) // not possible to be null b/c nothing in the app shows up until you connect
-    // console.dir(LuckyLens)
+    const LuckyLens = LuckyLensMumbai.connect(signer!) // not possible to be null b/c nothing in the app shows up until you connect
+    console.dir(LuckyLens)
 
 
     const solidityTime = new Date(date + " " + time).valueOf() // converts to seconds since epoch
 
     const timeParam = now ? 1 : solidityTime
     let tx
-    // if(now) tx = await LuckyLens.newRaffleDrawNow(profileId, pubId)
-    // if(!now) tx = await LuckyLens.postRaffle(profileId, pubId, timeParam)
+    if(now) tx = await LuckyLens.newRaffleDrawNow(profileId, pubId)
+    if(!now) tx = await LuckyLens.postRaffle(profileId, pubId, timeParam)
 
 
   
@@ -67,17 +67,17 @@ export default function Home() {
   }, [wallet])
 
   // gets lens profile from connected address
-  // useEffect(() => {
-  //   if(address === "") return
-  //   async function effectCall() {
-  //   // const profile:(ProfileFieldsFragment | null) = address ? await getProfile(address) : null;
-  //   setProfile(profile)
-  //   }
-  //   effectCall()
-  // }, [address])
+  useEffect(() => {
+    if(address === "") return
+    async function effectCall() {
+    const profile:(ProfileFieldsFragment | null) = address ? await getProfile(address) : null;
+    setProfile(profile)
+    }
+    effectCall()
+  }, [address])
 
-  // const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
-  // const some =  Date.now()
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+  const some =  Date.now()
 
   return (
     <div className='pt-10 text-center h-screen'>
@@ -120,7 +120,7 @@ export default function Home() {
               {!newRaffleData?.now ? <>
                 <input type='date' value={newRaffleData?.date} onChange={e => setNewRaffleData(prevState => ({...prevState, date: e.target.value}))}/>
                 <input type='time' value={newRaffleData?.time} onChange={e => setNewRaffleData(prevState => ({...prevState, time: e.target.value}))}/>
-                {/* {timezone} */}
+                {timezone}
               </> : null}
               {/* <button className='form-input bg-slate-300' onClick={() => setNewRaffleData(prevState => ({...prevState, date: "0", time: "0"}))}>now</button> */}
           </label>
