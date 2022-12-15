@@ -6,7 +6,7 @@ import { client, getProfile } from '../lib/lensApi/api'
 import { useConnectWallet } from '@web3-onboard/react'
 import { ProfileFieldsFragment } from '../lib/lensApi/generated'
 import { ethers } from 'ethers'
-import { LuckyLensMumbai } from '../lib/contracts/address'
+import { getRaffles, LuckyLensMumbai } from '../lib/contracts/address'
 import { Web3OnboardProvider, init } from '@web3-onboard/react'
 import injectedModule from '@web3-onboard/injected-wallets'
 import walletConnectModule from '@web3-onboard/walletconnect'
@@ -44,7 +44,7 @@ export default function Home() {
 
     const timeParam = now ? 1 : new Date(date + " " + time).valueOf() // converts to seconds since epoch
     if(timeParam < Date.now() && timeParam != 1) console.error('invalid time param')
-    
+
     let tx
     try{
     if(now) tx = await LuckyLens.newRaffleDrawNow(profileId, pubId)
@@ -61,7 +61,6 @@ export default function Home() {
 
   // updates address, provider, signer based on web3Onboard's wallet
   useEffect(() => {
-    if(wallet === null) return
     setAddress(wallet?.accounts[0].address)
     const provider = wallet ? new ethers.providers.Web3Provider(wallet.provider, 'any') : null
     provider ? setProvider(provider) : console.log('ooops, couldnt get provider. provider is', provider)
@@ -72,13 +71,15 @@ export default function Home() {
 
   // gets lens profile from connected address
   useEffect(() => {
-    if(address === "") return
+    if(!address) return
     async function effectCall() {
-    const profile:(ProfileFieldsFragment | null) = address ? await getProfile(address) : null;
-    setProfile(profile)
+      if(!address || !provider) return
+      const profile:ProfileFieldsFragment = await getProfile(address)
+      setProfile(profile)
+      const rafflesForAddress:any[] = await getRaffles(address, provider)
     }
     effectCall()
-  }, [address])
+  }, [address, provider])
 
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
