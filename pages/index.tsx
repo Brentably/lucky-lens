@@ -10,6 +10,8 @@ import { LuckyLensMumbai } from '../lib/contracts/address'
 import { Web3OnboardProvider, init } from '@web3-onboard/react'
 import injectedModule from '@web3-onboard/injected-wallets'
 import walletConnectModule from '@web3-onboard/walletconnect'
+import { NextPage } from 'next'
+import { Props, ScriptProps } from 'next/script'
 
 
 export type newRaffleData = {
@@ -37,8 +39,7 @@ const web3Onboard = init({
   ]
 })
 
-
-export default function Home() {
+const Home:NextPage<ScriptProps> = ()=> {
   const [{ wallet, connecting }, connect, disconnect] = useConnectWallet()
   const [address, setAddress] = useState<string | undefined>("")
   const [provider, setProvider] = useState<ethers.providers.Web3Provider | null>(null)
@@ -149,3 +150,5 @@ export default function Home() {
     </div>
   )
 }
+
+export default Home
