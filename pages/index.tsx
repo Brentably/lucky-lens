@@ -32,7 +32,7 @@ export type postedRaffle = {
 
 export default function Home() {
   const [{ wallet, connecting }, connect, disconnect] = useConnectWallet()
-  const [address, setAddress] = useState<string | undefined>("")
+  const [address, setAddress] = useState<string>("")
   const [provider, setProvider] = useState<ethers.providers.Web3Provider | null>(null)
   const [signer, setSigner] = useState<ethers.Signer | null>(null)
   const [profile, setProfile] = useState<ProfileFieldsFragment | null>(null)
@@ -49,6 +49,9 @@ export default function Home() {
     const LuckyLens = LuckyLensMumbai.connect(signer!) // not possible to be null b/c nothing in the app shows up until you connect
     console.dir(LuckyLens)
 
+    // set handling for state update.
+    const postRaffleFilter = LuckyLensMumbai.filters.PostRaffle(address)
+    LuckyLensMumbai.once(postRaffleFilter, () => updateRaffles(address))
 
 
     const timeParam = now ? 1 : new Date(date + " " + time).valueOf() // converts to seconds since epoch
@@ -70,7 +73,7 @@ export default function Home() {
 
   // updates address, provider, signer based on web3Onboard's wallet
   useEffect(() => {
-    setAddress(wallet?.accounts[0].address)
+    setAddress(wallet?.accounts[0].address || "")
     const provider = wallet ? new ethers.providers.Web3Provider(wallet.provider, 'any') : null
     provider ? setProvider(provider) : console.log('ooops, couldnt get provider. provider is', provider)
     const signer = provider?.getSigner() 
@@ -80,18 +83,25 @@ export default function Home() {
 
   // gets lens profile from connected address
 
+  async function updateProfile(address: string) {
+    // const profile:ProfileFieldsFragment = await getProfile(address)
+    // setProfile(profile)
+    // const profile:ProfileFieldsFragment = await getProfile(address)
+    setProfile(await getProfile(address))
+  }
+  async function updateRaffles(address: string) {
+    // const rafflesForAddress:any[] = await getRaffles(address)
+    // setRaffles(rafflesForAddress)
+    // const rafflesForAddress:any[] = 
+    setRaffles(await getRaffles(address))
+  }
+  
   useEffect(() => {
     if(!address) return
-    async function effectCall() {
-      if(!address || !provider) return
-      const profile:ProfileFieldsFragment = await getProfile(address)
-      setProfile(profile)
-      const rafflesForAddress:any[] = await getRaffles(address, provider)
-      setRaffles(rafflesForAddress)
-    }
+    updateProfile(address)
+    updateRaffles(address)
+  }, [address])
 
-    effectCall()
-  }, [address, provider])
 
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
