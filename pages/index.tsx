@@ -12,7 +12,7 @@ import injectedModule from '@web3-onboard/injected-wallets'
 import walletConnectModule from '@web3-onboard/walletconnect'
 
 
-export type newRaffleData = {
+type newRaffleData = {
   profileId?: string,
   pubId?: string,
   date?: string,
