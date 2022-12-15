@@ -41,9 +41,10 @@ export default function Home() {
     console.dir(LuckyLens)
 
 
-    const solidityTime = new Date(date + " " + time).valueOf() // converts to seconds since epoch
 
-    const timeParam = now ? 1 : solidityTime
+    const timeParam = now ? 1 : new Date(date + " " + time).valueOf() // converts to seconds since epoch
+    if(timeParam < Date.now() && timeParam != 1) console.error('invalid time param')
+    
     let tx
     try{
     if(now) tx = await LuckyLens.newRaffleDrawNow(profileId, pubId)
@@ -80,7 +81,6 @@ export default function Home() {
   }, [address])
 
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
-  const some =  Date.now()
 
   return (
     <div className='pt-10 text-center h-screen'>
@@ -133,6 +133,8 @@ export default function Home() {
 
 
          <div className='my-20'>Giveaways listed here</div>
+
+
         </>: null}
 
     </div>
