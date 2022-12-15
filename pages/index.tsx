@@ -2,30 +2,28 @@ import Head from 'next/head'
 import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { client, getProfile } from '../lib/lensApi/api'
-// import styles from '../styles/Home.module.css'
 import { useAppState, useConnectWallet } from '@web3-onboard/react'
 import { ProfileFieldsFragment } from '../lib/lensApi/generated'
 import { BigNumber, ethers } from 'ethers'
 import { getRaffles, LuckyLensMumbai } from '../lib/contracts/LuckyLens'
-import { Web3OnboardProvider, init } from '@web3-onboard/react'
-import injectedModule from '@web3-onboard/injected-wallets'
-import walletConnectModule from '@web3-onboard/walletconnect'
-import { Result } from '@ethersproject/abi/lib/interface'
+import RaffleCard from '../components/RaffleCard'
 
 
-type newRaffleData = {
+type NewRaffleData = {
   profileId?: string,
   pubId?: string,
   date?: string,
   time?: string,
   now?: boolean
 }
-export type postedRaffle = {
+export type RaffleData = {
   owner: string,
   profileId: string,
   pubId: string,
   raffleId: string,
-  time: string
+  time: string,
+  passed: boolean,
+  date: Date
 }
 
 
@@ -36,9 +34,9 @@ export default function Home() {
   const [provider, setProvider] = useState<ethers.providers.Web3Provider | null>(null)
   const [signer, setSigner] = useState<ethers.Signer | null>(null)
   const [profile, setProfile] = useState<ProfileFieldsFragment | null>(null)
-  const [newRaffleData, setNewRaffleData] = useState<newRaffleData | null>(null)
+  const [newRaffleData, setNewRaffleData] = useState<NewRaffleData | null>(null)
   useEffect(() => console.log(newRaffleData), [newRaffleData])
-  const [raffles, setRaffles] = useState<postedRaffle[] | null>(null)
+  const [raffles, setRaffles] = useState<RaffleData[] | null>(null)
   useEffect(() => console.log(raffles), [raffles])
 
   const handleNewRaffle = async () => {
@@ -158,12 +156,7 @@ export default function Home() {
           {raffles.length == 0 && <div className='my-20'>no raffles found</div>}
           
           <div className='max-w-lg mx-auto mt-2'>
-            {raffles.map(raffle => (
-            <div key={raffle.raffleId} className='bg-gray-400 border-black border-2 py-2'>
-
-            profileId: {raffle.profileId}, pubId: {raffle.pubId}, raffleId: {raffle.raffleId}, time: {raffle.time}
-
-            </div>))}
+            {raffles.map(raffle => <RaffleCard key={raffle.raffleId} {...raffle} />)}
           </div>
           </> : <div className='my-20'>loading raffles</div>}
         </>: null}

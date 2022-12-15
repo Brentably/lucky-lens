@@ -1,6 +1,6 @@
 
-import { Contract, ethers } from 'ethers'
-import { postedRaffle } from '../../pages'
+import { BigNumber, Contract, ethers } from 'ethers'
+import { RaffleData } from '../../pages'
 import { ALCHEMY_KEY_MUMBAI } from '../../pages/_app'
 import LuckyLensJson from './LuckyLens.json'
 // abi => api
@@ -18,17 +18,20 @@ export const getRaffles = async(address: string):Promise<any[]> => {
 
 const postRaffleFilter = LuckyLensMumbai.filters.PostRaffle(address)
 const postRaffleLogs = await LuckyLensMumbai.queryFilter(postRaffleFilter, -200000, 'latest') //hardcoded -200000 blocks ago to now
-console.log(postRaffleLogs)
+const cleanItUp = postRaffleLogs.map(log => ({owner: log.args?.owner, profileId: log.args?.profileId, pubId: log.args?.pubId, raffleId: log.args?.raffleId, time: log.args?.time}))
+const justRaffleIds:BigNumber[] = cleanItUp.map(raffle => raffle.raffleId)
+const randomNums = await LuckyLensMumbai.getRandomNums(justRaffleIds)
+
 const final = []
-
-for(let i = 0; i < postRaffleLogs.length; i++) {
-
-  const {owner, profileId, pubId, raffleId, time} = postRaffleLogs[i].args!
-  let passed; 
+for(let i = 0; i < cleanItUp.length; i++) {
+  const {owner, profileId, pubId, raffleId, time} = cleanItUp[i]
+  const randomNum = randomNums[i]
+  
+  let passed = false; 
   if(time.toString() == '1') passed = true
-  const raffleTime = passed ? null : new Date(time)
+  if(Date.now() >= time) passed = true
+  const date = passed ? null : new Date(time)
 
-  const data = await LuckyLensMumbai.Raffles(raffleId)
 
 
   final.push({ //most are bignums so mapping to strings
@@ -36,7 +39,9 @@ for(let i = 0; i < postRaffleLogs.length; i++) {
     profileId: profileId.toString(),
     pubId: pubId.toString(),
     raffleId: raffleId.toString(),
-    time: time.toString(),
+    time: time,
+    passed,
+    date
   })
 }
 
