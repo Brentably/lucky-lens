@@ -6,10 +6,10 @@ import { client, getProfile } from '../lib/lensApi/api'
 import { useConnectWallet } from '@web3-onboard/react'
 import { ProfileFieldsFragment } from '../lib/lensApi/generated'
 import { ethers } from 'ethers'
-import {handleNewRaffle} from '../helpers/handlers'
+import { LuckyLensMumbai } from '../lib/contracts/address'
 
 
-type newRaffleData = {
+export type newRaffleData = {
   profileId?: string,
   pubId?: string,
   date?: string,
@@ -22,17 +22,43 @@ export default function Home() {
   const [{ wallet, connecting }, connect, disconnect] = useConnectWallet()
   const [address, setAddress] = useState<string | undefined>("")
   const [provider, setProvider] = useState<ethers.providers.Web3Provider | null>(null)
+  const [signer, setSigner] = useState<ethers.Signer | null>(null)
   const [profile, setProfile] = useState<ProfileFieldsFragment | null>(null)
   const [newRaffleData, setNewRaffleData] = useState<newRaffleData | null>(null)
   useEffect(() => console.log(newRaffleData), [newRaffleData])
 
 
-  // updates address and provider based on web3Onboard's wallet
+  const handleNewRaffle = async () => {
+    const {profileId, pubId, date, time, now} = newRaffleData!
+    if(!profileId || !pubId) console.error('tried to create new Raffle without params')
+    if(!(date && time) && !now) console.error('tried to create new Raffle without params')
+    console.log("new giveaway with newRaffleData:", newRaffleData)
+    const LuckyLens = LuckyLensMumbai.connect(signer!) // not possible to be null b/c nothing in the app shows up until you connect
+    console.dir(LuckyLens)
+
+
+    const solidityTime = new Date(date + " " + time).valueOf() // converts to seconds since epoch
+
+    const timeParam = now ? 1 : solidityTime
+    let tx
+    if(now) tx = await LuckyLens.newRaffleDrawNow(profileId, pubId)
+    if(!now) tx = await LuckyLens.postRaffle(profileId, pubId, timeParam)
+
+
+  
+    return null
+  }
+  
+
+
+  // updates address, provider, signer based on web3Onboard's wallet
   useEffect(() => {
     setAddress(wallet?.accounts[0].address)
-    let provider = wallet ? new ethers.providers.Web3Provider(wallet.provider, 'any') : null
-    setProvider(provider)
-    console.log('address and provider connected')
+    const provider = wallet ? new ethers.providers.Web3Provider(wallet.provider, 'any') : null
+    provider ? setProvider(provider) : console.log('ooops, couldnt get provider. provider is', provider)
+    const signer = provider?.getSigner() 
+    signer ? setSigner(signer) : console.log('oops, couldnt get signer, signer is', signer)
+    console.log('address, provider, signer connected')
   }, [wallet])
 
   // gets lens profile from connected address
@@ -43,6 +69,9 @@ export default function Home() {
     }
     effectCall()
   }, [address])
+
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+  const some =  Date.now()
 
   return (
     <div className='pt-10 text-center h-screen'>
@@ -66,27 +95,31 @@ export default function Home() {
         {address ? <>
 
           {/* form is supposed to look bad rn */}
-         <label className='block'>
-          <div>Profile ID (number)</div>
-          <input type="number" onChange={e => setNewRaffleData(prevState => ({...prevState, profileId: e.target.value}))}/> 
-         </label>
-         <label className='block'>
-          <div>Publication ID (number)</div>
-          <input type="number" onChange={e => setNewRaffleData(prevState => ({...prevState, pubId: e.target.value}))}/> 
-         </label>
-         <label className='block'>
-          <div>Raffle Time</div>
+        <div id="form" className='mt-4'>
+          <div className='font-semibold text-lg my-2'>Create a new raffle:</div>
 
-          Now?<input type="checkbox" className='m-3' checked={newRaffleData?.now} onChange={e => setNewRaffleData(prevState => ({...prevState, now: e.target.checked}))}/><br/>
+          <label className='block'>
+              <div className='font-medium'>Profile ID (number)</div>
+              <input type="number" onChange={e => setNewRaffleData(prevState => ({...prevState, profileId: e.target.value}))}/> 
+          </label>
+          <label className='block'>
+              <div className='font-medium'>Publication ID (number)</div>
+              <input type="number" onChange={e => setNewRaffleData(prevState => ({...prevState, pubId: e.target.value}))}/> 
+          </label>
+          <label className='block'>
+              <div className='font-medium'>Raffle Time</div>
 
-          {!newRaffleData?.now ? <>
-          <input type='date' value={newRaffleData?.date} onChange={e => setNewRaffleData(prevState => ({...prevState, date: e.target.value}))}/>
-          <input type='time' value={newRaffleData?.time} onChange={e => setNewRaffleData(prevState => ({...prevState, time: e.target.value}))}/>
-          </> : null}
-          {/* <button className='form-input bg-slate-300' onClick={() => setNewRaffleData(prevState => ({...prevState, date: "0", time: "0"}))}>now</button> */}
-         </label>
-         <button className='mt-10 bg-green-700 text-white rounded-xl p-2' onClick={() => handleNewRaffle(newRaffleData)}>Create Raffle</button>
+              Now?<input type="checkbox" className='m-3' checked={Boolean(newRaffleData?.now)} onChange={e => setNewRaffleData(prevState => ({...prevState, now: e.target.checked}))}/><br/>
 
+              {!newRaffleData?.now ? <>
+                <input type='date' value={newRaffleData?.date} onChange={e => setNewRaffleData(prevState => ({...prevState, date: e.target.value}))}/>
+                <input type='time' value={newRaffleData?.time} onChange={e => setNewRaffleData(prevState => ({...prevState, time: e.target.value}))}/>
+                {timezone}
+              </> : null}
+              {/* <button className='form-input bg-slate-300' onClick={() => setNewRaffleData(prevState => ({...prevState, date: "0", time: "0"}))}>now</button> */}
+          </label>
+          <button disabled={!newRaffleData} className='mt-2 bg-green-700 text-white rounded-xl p-2' onClick={handleNewRaffle}>Create Raffle</button>
+        </div>
 
 
 
