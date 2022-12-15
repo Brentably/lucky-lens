@@ -45,10 +45,13 @@ export default function Home() {
 
     const timeParam = now ? 1 : solidityTime
     let tx
+    try{
     if(now) tx = await LuckyLens.newRaffleDrawNow(profileId, pubId)
     if(!now) tx = await LuckyLens.postRaffle(profileId, pubId, timeParam)
-
-
+    } catch(err) {
+      console.log(err)
+    }
+    console.log(tx)
   
     return null
   }
@@ -120,9 +123,9 @@ export default function Home() {
               {!newRaffleData?.now ? <>
                 <input type='date' value={newRaffleData?.date} onChange={e => setNewRaffleData(prevState => ({...prevState, date: e.target.value}))}/>
                 <input type='time' value={newRaffleData?.time} onChange={e => setNewRaffleData(prevState => ({...prevState, time: e.target.value}))}/>
-                {timezone}
+                <span className='ml-1'>{timezone}</span>
               </> : null}
-              {/* <button className='form-input bg-slate-300' onClick={() => setNewRaffleData(prevState => ({...prevState, date: "0", time: "0"}))}>now</button> */}
+
           </label>
           <button disabled={!newRaffleData} className='mt-2 bg-green-700 text-white rounded-xl p-2' onClick={handleNewRaffle}>Create Raffle</button>
         </div>
