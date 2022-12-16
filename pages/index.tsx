@@ -156,7 +156,8 @@ export default function Home() {
 
           {raffles.length == 0 && <div className='my-20'>no raffles found</div>}
           
-          <div className='max-w-lg mx-auto mt-2'>
+          <div className='max-w-lg mx-auto mt-6'>
+            <div className='text-lg'>Your Raffles:</div>
             {raffles.map(raffle => <RaffleCard key={raffle.raffleId} {...raffle} />)}
           </div>
           </> : <div className='my-20'>loading raffles</div>}

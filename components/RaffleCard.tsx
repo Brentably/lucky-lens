@@ -22,7 +22,7 @@ const RaffleCard = (props:RaffleData) => {
 
 let interval = timer > 0 ? prettyMilliseconds(timer*1000) : null
 return (
-    <div className='bg-gray-400 border-black border-2 py-2'>
+    <div className='border-black border -mt-px h-16 flex justify-center items-center'>
 
     profileId: {profileId}, pubId: {pubId}, raffleId: {raffleId}, {interval ?
      `raffle ends in ${interval}`
