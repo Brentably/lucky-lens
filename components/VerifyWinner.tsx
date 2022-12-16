@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { getQualifiedEntrants } from "../lib/contracts/LuckyLens"
+import { getQualifiedEntrants } from "../lib/contracts/LuckyLens/LuckyLens"
 
 
 const VerifyWinner = () => {

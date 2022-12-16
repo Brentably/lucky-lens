@@ -1,8 +1,8 @@
 
 import { BigNumber, Contract, ethers } from 'ethers'
-import { ALCHEMY_KEY_MUMBAI } from '../../pages/_app'
-import { getPublication } from '../lensApi/api'
-import { postedRaffleLog } from '../types'
+import { ALCHEMY_KEY_MUMBAI } from '../../../pages/_app'
+import { getPublication } from '../../lensApi/api'
+import { postedRaffleLog } from '../../types'
 import LuckyLensJson from './LuckyLens.json'
 // abi => api
 
@@ -59,8 +59,9 @@ export const getQualifiedEntrants = async(raffleId: string, requirements:string)
   const raffleData = await LuckyLensMumbai.Raffles(raffleId)
   const {profileId, pubId} = raffleData
   
-  // now we can query the lens api with the profile / pub id to determine 1. who has commented and optionally filter if they've followed or not
-  const publication = getPublication(profileId, pubId)
+  // getting all valid comment elogs, will start by trying to plug in event abi to contract and filter for that, but if must, then will do lower level log filtering
+  
+
   
 
 
