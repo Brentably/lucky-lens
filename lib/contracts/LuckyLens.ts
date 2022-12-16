@@ -9,7 +9,7 @@ export const defaultProvider = new ethers.providers.AlchemyProvider('maticmum', 
 
 // exports ethers contract that can be connected to a signer with contract.connect(Signer)
 // in the future can pre-connect to app's provider in here if read-only calls are prevalent in the app
-export const LuckyLensMumbai:Contract = new ethers.Contract("0x3042a9B8d65D216bae355873d70237bf1A399900", LuckyLensJson.abi, defaultProvider)
+export const LuckyLensMumbai:Contract = new ethers.Contract("0x1622E45Ec8297F4195C10A31e1e18c96D434D8C8", LuckyLensJson.abi, defaultProvider)
 console.dir(LuckyLensMumbai)
 
 
@@ -31,7 +31,7 @@ for(let i = 0; i < cleanItUp.length; i++) {
   if(s_time.toString() == '1') passed = true
   if(Date.now() / 1000 > s_time) passed = true // Date.now() is in milliseconds but our time value should be in seconds
   const date = passed ? null : new Date(s_time*1000) // don't need to multiply by 1000, it takes seconds
-  console.log(date) // I need to see if it makes this date correctly
+
 
   final.push({ //most are bignums so mapping to strings
     owner: owner,
@@ -40,7 +40,8 @@ for(let i = 0; i < cleanItUp.length; i++) {
     raffleId: raffleId.toString(),
     s_time: s_time,
     passed,
-    date
+    date,
+    randomNum: randomNum.toString()
   })
 }
 

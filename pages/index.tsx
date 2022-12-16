@@ -23,7 +23,8 @@ export type RaffleData = {
   raffleId: string,
   s_time: number, //time in seconds
   passed: boolean,
-  date: Date
+  date: Date,
+  randomNum: string
 }
 
 
@@ -68,7 +69,22 @@ export default function Home() {
     return null
   }
   
+  const handleGenerateWinner = async (raffleId: string) => {
+    const LuckyLens = LuckyLensMumbai.connect(signer!) // not possible to be null b/c nothing in the app shows up until you connect
+    console.log(`generating winner for raffle ${raffleId}`)
 
+
+    const winnerFilter = LuckyLensMumbai.filters.RequestFulfilled(raffleId)
+    LuckyLensMumbai.once(winnerFilter, () => updateRaffles(address))
+
+    let tx
+    try{
+    tx = await LuckyLens.chooseRandomWinner(raffleId)
+    } catch(err) {
+      console.log(err)
+    }
+    console.log(tx)
+  }
 
   // updates address, provider, signer based on web3Onboard's wallet
   useEffect(() => {
@@ -105,7 +121,7 @@ export default function Home() {
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
   return (
-    <div className='pt-10 text-center h-screen mx-auto max-w-3xl'>
+    <div className='pt-10 text-center mx-auto py-10 max-w-3xl'>
       <Head>
         <title>Create Next App</title>
         <meta name="Lucky lens" content="Lucky Lens is a way to verifiably randomly choose a winner for a giveaway" />
@@ -140,7 +156,7 @@ export default function Home() {
             <label className='block'>
                 <div className='font-medium'>Raffle Time</div>
 
-                Now?<input type="checkbox" className='m-3' checked={Boolean(newRaffleData?.now)} onChange={e => setNewRaffleData(prevState => ({...prevState, now: e.target.checked}))}/><br/>
+                <span className='inline-block mb-2'>Now?</span><input type="checkbox" className='mx-2 mb-1' checked={Boolean(newRaffleData?.now)} onChange={e => setNewRaffleData(prevState => ({...prevState, now: e.target.checked}))}/><br/>
 
                 {!newRaffleData?.now ? <>
                   <input type='date' value={newRaffleData?.date} onChange={e => setNewRaffleData(prevState => ({...prevState, date: e.target.value}))}/>
@@ -158,7 +174,7 @@ export default function Home() {
           
           <div className='max-w-lg mx-auto mt-6'>
             <div className='text-lg'>Your Raffles:</div>
-            {raffles.map(raffle => <RaffleCard key={raffle.raffleId} {...raffle} />)}
+            {raffles.map(raffle => <RaffleCard key={raffle.raffleId} {...raffle} generateWinner={() => handleGenerateWinner(raffle.raffleId)}/>)}
           </div>
           </> : <div className='my-20'>loading raffles</div>}
         </>: null}
