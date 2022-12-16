@@ -45,8 +45,18 @@ for(let i = 0; i < cleanItUp.length; i++) {
   })
 }
 
-
-
-
 return final.reverse() // reverse to show newest first
+}
+
+
+export const getQualifiedEntrants = async(raffleId: string, requirements:string):Promise<any[]> => {
+  // first thing to do is get the raffle data from the contract for the given raffleId
+  const raffleData = await LuckyLensMumbai.Raffles(raffleId)
+  const {profileId, pubId} = raffleData
+  
+  // now we can query the lens api with the profile / pub id to determine 1. who has commented and 2. if they follow the poster
+
+
+
+  return []
 }

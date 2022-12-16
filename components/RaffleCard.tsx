@@ -32,7 +32,7 @@ const RaffleCard = (props:RaffleCard) => {
       <div className='border-black border -mt-px '>
 
       profileId: {profileId}, pubId: {pubId}, raffleId: {raffleId}, {interval} 
-      random: {randomNum.substring(0, 10)}
+      hasWinner: {String(canVerify)}
       {canVerify ? 
         <button className='bg-neutral-400 p-2 rounded-xl' onClick={()=>console.log(`verifying winner on raffle ${raffleId}`)}>verify</button> 
         : null}

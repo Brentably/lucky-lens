@@ -7,6 +7,7 @@ import { ProfileFieldsFragment } from '../lib/lensApi/generated'
 import { BigNumber, ethers } from 'ethers'
 import { getRaffles, LuckyLensMumbai } from '../lib/contracts/LuckyLens'
 import RaffleCard from '../components/RaffleCard'
+import VerifyWinner from '../components/VerifyWinner'
 
 
 type NewRaffleData = {
@@ -40,6 +41,7 @@ export default function Home() {
   const [raffles, setRaffles] = useState<RaffleData[] | null>(null)
   useEffect(() => console.log(raffles), [raffles])
 
+  // lucky lens frontend => lucky lens contract
   const handleNewRaffle = async () => {
     const {profileId, pubId, date, time, now} = newRaffleData!
     if(!profileId || !pubId) console.error('tried to create new Raffle without params')
@@ -68,7 +70,8 @@ export default function Home() {
   
     return null
   }
-  
+
+  // lucky lens frontend => lucky lens contract
   const handleGenerateWinner = async (raffleId: string) => {
     const LuckyLens = LuckyLensMumbai.connect(signer!) // not possible to be null b/c nothing in the app shows up until you connect
     console.log(`generating winner for raffle ${raffleId}`)
@@ -96,21 +99,17 @@ export default function Home() {
     console.log('address, provider, signer connected')
   }, [wallet])
 
+  
   // gets lens profile from connected address
-
   async function updateProfile(address: string) {
-    // const profile:ProfileFieldsFragment = await getProfile(address)
-    // setProfile(profile)
-    // const profile:ProfileFieldsFragment = await getProfile(address)
     setProfile(await getProfile(address))
   }
+  // gets raffles from connected address
   async function updateRaffles(address: string) {
-    // const rafflesForAddress:any[] = await getRaffles(address)
-    // setRaffles(rafflesForAddress)
-    // const rafflesForAddress:any[] = 
     setRaffles(await getRaffles(address))
   }
   
+  // fetch lens profile and live raffles from current address
   useEffect(() => {
     if(!address) return
     updateProfile(address)
@@ -121,7 +120,7 @@ export default function Home() {
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
   return (
-    <div className='pt-10 text-center mx-auto py-10 max-w-3xl'>
+    <div className='pt-10 text-center mx-auto my-10 py-10 max-w-3xl'>
       <Head>
         <title>Create Next App</title>
         <meta name="Lucky lens" content="Lucky Lens is a way to verifiably randomly choose a winner for a giveaway" />
@@ -179,6 +178,10 @@ export default function Home() {
           </> : <div className='my-20'>loading raffles</div>}
         </>: null}
 
+
+        <VerifyWinner/>
+
+        
     </div>
   )
 }
