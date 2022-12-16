@@ -36,13 +36,14 @@ export interface LuckyLensInterface extends utils.Interface {
     "isAfter(uint256)": FunctionFragment;
     "lastRequestId()": FunctionFragment;
     "newRaffleDrawNow(uint256,uint256)": FunctionFragment;
-    "postRaffle(uint256,uint256,uint48)": FunctionFragment;
+    "postRaffle(uint256,uint256,uint256)": FunctionFragment;
     "rawFulfillRandomWords(uint256,uint256[])": FunctionFragment;
     "requestIdToRaffleId(uint256)": FunctionFragment;
     "requestIds(uint256)": FunctionFragment;
     "s_requests(uint256)": FunctionFragment;
     "timestamp()": FunctionFragment;
     "totalRaffles()": FunctionFragment;
+    "verifyWinner(uint256,uint256)": FunctionFragment;
   };
 
   getFunction(
@@ -61,6 +62,7 @@ export interface LuckyLensInterface extends utils.Interface {
       | "s_requests"
       | "timestamp"
       | "totalRaffles"
+      | "verifyWinner"
   ): FunctionFragment;
 
   encodeFunctionData(
@@ -120,6 +122,10 @@ export interface LuckyLensInterface extends utils.Interface {
     functionFragment: "totalRaffles",
     values?: undefined
   ): string;
+  encodeFunctionData(
+    functionFragment: "verifyWinner",
+    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BigNumberish>]
+  ): string;
 
   decodeFunctionResult(functionFragment: "Raffles", data: BytesLike): Result;
   decodeFunctionResult(
@@ -159,9 +165,13 @@ export interface LuckyLensInterface extends utils.Interface {
     functionFragment: "totalRaffles",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "verifyWinner",
+    data: BytesLike
+  ): Result;
 
   events: {
-    "PostRaffle(address,uint256,uint256,uint256,uint48)": EventFragment;
+    "PostRaffle(address,uint256,uint256,uint256,uint256)": EventFragment;
     "RequestFulfilled(uint256,uint256,uint256)": EventFragment;
     "RequestSent(uint256,uint256,uint32)": EventFragment;
   };
@@ -176,10 +186,10 @@ export interface PostRaffleEventObject {
   raffleId: BigNumber;
   profileId: BigNumber;
   pubId: BigNumber;
-  time: number;
+  time: BigNumber;
 }
 export type PostRaffleEvent = TypedEvent<
-  [string, BigNumber, BigNumber, BigNumber, number],
+  [string, BigNumber, BigNumber, BigNumber, BigNumber],
   PostRaffleEventObject
 >;
 
@@ -241,11 +251,11 @@ export interface LuckyLens extends BaseContract {
       arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<
-      [string, BigNumber, BigNumber, number, BigNumber] & {
+      [string, BigNumber, BigNumber, BigNumber, BigNumber] & {
         owner: string;
         profileId: BigNumber;
         pubId: BigNumber;
-        time: number;
+        time: BigNumber;
         randomNum: BigNumber;
       }
     >;
@@ -311,17 +321,23 @@ export interface LuckyLens extends BaseContract {
     timestamp(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     totalRaffles(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    verifyWinner(
+      numberOfEntrants: PromiseOrValue<BigNumberish>,
+      randomNum: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
   };
 
   Raffles(
     arg0: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
   ): Promise<
-    [string, BigNumber, BigNumber, number, BigNumber] & {
+    [string, BigNumber, BigNumber, BigNumber, BigNumber] & {
       owner: string;
       profileId: BigNumber;
       pubId: BigNumber;
-      time: number;
+      time: BigNumber;
       randomNum: BigNumber;
     }
   >;
@@ -388,16 +404,22 @@ export interface LuckyLens extends BaseContract {
 
   totalRaffles(overrides?: CallOverrides): Promise<BigNumber>;
 
+  verifyWinner(
+    numberOfEntrants: PromiseOrValue<BigNumberish>,
+    randomNum: PromiseOrValue<BigNumberish>,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
   callStatic: {
     Raffles(
       arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<
-      [string, BigNumber, BigNumber, number, BigNumber] & {
+      [string, BigNumber, BigNumber, BigNumber, BigNumber] & {
         owner: string;
         profileId: BigNumber;
         pubId: BigNumber;
-        time: number;
+        time: BigNumber;
         randomNum: BigNumber;
       }
     >;
@@ -463,10 +485,16 @@ export interface LuckyLens extends BaseContract {
     timestamp(overrides?: CallOverrides): Promise<BigNumber>;
 
     totalRaffles(overrides?: CallOverrides): Promise<BigNumber>;
+
+    verifyWinner(
+      numberOfEntrants: PromiseOrValue<BigNumberish>,
+      randomNum: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
   };
 
   filters: {
-    "PostRaffle(address,uint256,uint256,uint256,uint48)"(
+    "PostRaffle(address,uint256,uint256,uint256,uint256)"(
       owner?: PromiseOrValue<string> | null,
       raffleId?: PromiseOrValue<BigNumberish> | null,
       profileId?: PromiseOrValue<BigNumberish> | null,
@@ -569,6 +597,12 @@ export interface LuckyLens extends BaseContract {
     timestamp(overrides?: CallOverrides): Promise<BigNumber>;
 
     totalRaffles(overrides?: CallOverrides): Promise<BigNumber>;
+
+    verifyWinner(
+      numberOfEntrants: PromiseOrValue<BigNumberish>,
+      randomNum: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -636,5 +670,11 @@ export interface LuckyLens extends BaseContract {
     timestamp(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     totalRaffles(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    verifyWinner(
+      numberOfEntrants: PromiseOrValue<BigNumberish>,
+      randomNum: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
   };
 }

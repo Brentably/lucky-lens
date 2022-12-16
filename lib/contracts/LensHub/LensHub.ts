@@ -8,16 +8,18 @@ const API_URL = 'https://api.thegraph.com/subgraphs/name/brentably/lens-mumbai'
 
 export const client = createClient({
   url: API_URL,
+  requestPolicy: "network-only"
 })
 
 
-export const getComments = async (profileId: string, pubId: string, time:number):Promise<any> => {
-  const commentQuery = gql`{
+export const getComments = async (profileId: string, pubId: string, time:string):Promise<any> => {
+  const commentQuery = `
+  query MyQuery($profileIdPointed: ID!, $pubIdPointed: ID!, $stime: BigInt!) {
     commentCreateds(
-      first: 10
+      first: 1000
       orderBy: timestamp
       orderDirection: desc
-      where: {profileIdPointed: $profileIdPointed, pubIdPointed: $pubIdPointed}
+      where: {profileIdPointed: $profileIdPointed, pubIdPointed: $pubIdPointed, blockTimestamp_lte: $stime}
     ) {
       id
       profileId
@@ -26,12 +28,13 @@ export const getComments = async (profileId: string, pubId: string, time:number)
       blockTimestamp
       blockNumber
     }
-  }`
+  }
+  `
 
-  const result = await client.query(commentQuery, {profileIdPointed: profileId, pubIdPointed: pubId}).toPromise()
-  console.log(result)
+  const result = await client.query(commentQuery, {profileIdPointed: profileId, pubIdPointed: pubId, stime: time}).toPromise()
 
-  return []
+
+  return result.data.commentCreateds
 }
 
 

@@ -4,7 +4,7 @@ import { getSyntheticLeadingComments } from 'typescript'
 import { ALCHEMY_KEY_MUMBAI } from '../../../pages/_app'
 import { getPublication } from '../../lensApi/api'
 import { LuckyLens, LuckyLensInterface } from '../../types/LuckyLens/LuckyLens'
-import { postedRaffleLog, RaffleStruct } from '../../types/types'
+import { postedRaffleLog, RaffleData, RaffleStruct } from '../../types/types'
 import { getComments } from '../LensHub/LensHub'
 import LuckyLensJson from './LuckyLens.json'
 // abi => api
@@ -13,7 +13,7 @@ export const defaultProvider = new ethers.providers.AlchemyProvider('maticmum', 
 
 // exports ethers contract that can be connected to a signer with contract.connect(Signer)
 // in the future can pre-connect to app's provider in here if read-only calls are prevalent in the app
-export const LuckyLensMumbai:Contract = new ethers.Contract("0xFfA634f998F351185719D6C155617091D7AA6167",LuckyLensJson.abi, defaultProvider)
+export const LuckyLensMumbai:Contract = new ethers.Contract("0x5DF6873b6592A93df770b4FeA6a788B1484119ED",LuckyLensJson.abi, defaultProvider)
 console.dir(LuckyLensMumbai)
 
 
@@ -34,9 +34,9 @@ for(let i = 0; i < cleanItUp.length; i++) {
   const randomNum = randomNums[i]
   
   let passed = false; 
-  if(s_time.toString() == '1') passed = true
-  if(Date.now() / 1000 > s_time) passed = true // Date.now() is in milliseconds but our time value should be in seconds
-  const date = passed ? null : new Date(s_time*1000) // don't need to multiply by 1000, it takes seconds
+  // if(s_time.toString() == '1') passed = true
+  if(Date.now() / 1000 > s_time.toNumber()) passed = true // Date.now() is in milliseconds but our time value should be in seconds
+  const date = passed ? null : new Date(s_time.toNumber()*1000) // don't need to multiply by 1000, it takes seconds
 
 
   final.push({ //most are bignums so mapping to strings
@@ -44,7 +44,7 @@ for(let i = 0; i < cleanItUp.length; i++) {
     profileId: profileId.toString(),
     pubId: pubId.toString(),
     raffleId: raffleId.toString(),
-    s_time: s_time,
+    s_time: s_time.toString(),
     passed,
     date,
     randomNum: randomNum.toString()
@@ -60,14 +60,25 @@ export const getQualifiedEntrants = async(raffleId: string, requirements:string)
   const totalRaffles = await LuckyLensMumbai.totalRaffles()
   if(parseInt(raffleId) > totalRaffles-1) throw new Error('Raffle does not exist')
   const raffleData:postedRaffleLog = await LuckyLensMumbai.Raffles(raffleId)
-  console.log(raffleData)
-  const {profileId, pubId, time: s_time} = raffleData
-  
-  // using subgraph!
-  const allComments = await getComments(profileId.toString(), pubId.toString(), s_time)
 
+  const {profileId, pubId, time: s_time, randomNum} = raffleData
+  if(!randomNum || randomNum.toString() == "0") throw new Error("tried to get qualified entrants on a raffle whose randomNum was 0")
   
 
+  const allComments:any[] = await getComments(profileId.toString(), pubId.toString(), s_time.toString()) // caps out at 1000 for now
+
+  
+  console.log("all comments:", allComments)
+  const numEntrants = allComments.length
+  if(numEntrants==0) throw new Error("absolutely no entrants")
+
+  console.log("length is ",allComments.length)
+  console.log("random num is", randomNum)
+
+  const winnerIndex = randomNum.mod(numEntrants).toNumber()
+  console.log("winnderIndex", winnerIndex)
+
+  console.log(`winner is profile`,allComments[winnerIndex].profileId)
 
 
   return []

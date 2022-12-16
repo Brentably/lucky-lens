@@ -8,13 +8,14 @@ export type NewRaffleData = {
   now?: boolean
 }
 
-
+// call something else
 export type postedRaffleLog = {
   owner: string,
   profileId: BigNumber,
   pubId: BigNumber,
   raffleId: BigNumber,
-  time: number
+  time: BigNumber,
+  randomNum?: BigNumber
 }
 
 export interface RaffleStruct {
@@ -22,12 +23,12 @@ export interface RaffleStruct {
   profileId: string,
   pubId: string,
   raffleId: string,
-  time: number,
+  time: string,
   randomNum: string
 }
 
 export interface RaffleData extends RaffleStruct {
-  time: number, //time in seconds
+  time: string, //time in seconds
   passed: boolean,
   date: Date,
 }

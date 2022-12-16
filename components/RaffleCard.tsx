@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react"
-import { RaffleData } from "../pages"
+import { RaffleData } from '../lib/types/types'
 import prettyMilliseconds from 'pretty-ms';
 
 interface RaffleCard extends RaffleData {
@@ -11,8 +11,8 @@ interface RaffleCard extends RaffleData {
 // 3 cases here: the raffle hasn't ended, The raffle HAS ended but a winner has not been chosen (random num == 0), 
 // or the raffle has ended and a winner has been chosen (randomNum exists)
 const RaffleCard = (props:RaffleCard) => {
-  const { owner, profileId, pubId, raffleId, s_time, passed, date, randomNum, generateWinner} = props
-  const init = passed ? 0 : Math.floor((s_time - Date.now()/1000))
+  const { owner, profileId, pubId, raffleId, time: s_time, passed, date, randomNum, generateWinner} = props
+  const init = passed ? 0 : Math.floor((parseInt(s_time) - Date.now()/1000))
   const [timer, setTimer] = useState<number>(init)
 
 
@@ -21,7 +21,6 @@ const RaffleCard = (props:RaffleCard) => {
       setTimer(t => t-1)
     }, 1000)
 
-    console.log('bong')
     return () => clearInterval(timerId)
   }, [])
   
