@@ -1,12 +1,50 @@
-import { ALCHEMY_KEY_MUMBAI } from '../../../pages/_app'
-import EventsJson from './Events.json'
-import { Contract, ethers } from 'ethers'
-// abi => api
-
-export const defaultProvider = new ethers.providers.AlchemyProvider('maticmum', ALCHEMY_KEY_MUMBAI)
-
-// exports ethers contract that can be connected to a signer with contract.connect(Signer)
-// in the future can pre-connect to app's provider in here if read-only calls are prevalent in the app
-export const LensHubProxy:Contract = new ethers.Contract("0x60Ae865ee4C725cd04353b5AAb364553f56ceF82", EventsJson.abi, defaultProvider)
+import { profile } from 'console';
+import { BigNumber } from 'ethers';
+import { createClient, gql } from 'urql'
 
 
+
+const API_URL = 'https://api.thegraph.com/subgraphs/name/brentably/lens-mumbai'
+
+export const client = createClient({
+  url: API_URL,
+})
+
+
+export const getComments = async (profileId: string, pubId: string, time:number):Promise<any> => {
+  const commentQuery = gql`{
+    commentCreateds(
+      first: 10
+      orderBy: timestamp
+      orderDirection: desc
+      where: {profileIdPointed: $profileIdPointed, pubIdPointed: $pubIdPointed}
+    ) {
+      id
+      profileId
+      pubId
+      pubIdPointed
+      blockTimestamp
+      blockNumber
+    }
+  }`
+
+  const result = await client.query(commentQuery, {profileIdPointed: profileId, pubIdPointed: pubId}).toPromise()
+  console.log(result)
+
+  return []
+}
+
+
+
+
+// export const getProfile = async (address: string):Promise<ProfileFieldsFragmt>=> {
+//   // const defaultReq:DefaultProfileRequest = {ethereumAddress: address}
+//   // const defaultResult = await client.query(DefaultProfileDocument, {request: defaultReq} ).toPromise()
+//   // console.log(defaultResult.data?.defaultProfile)
+//   // if(defaultResult.data?.defaultProfile) return defaultResult.data.defaultProfile
+
+//   const backupRequest:ProfileQueryRequest = {ownedBy: [address]}
+//   const result = await client.query(ProfilesDocument, {request: backupRequest} ).toPromise()
+//   console.log(result.data?.profiles.items[0])
+//   return result.data!.profiles.items[0]
+// };

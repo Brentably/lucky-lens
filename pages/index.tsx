@@ -8,7 +8,7 @@ import { BigNumber, ethers } from 'ethers'
 import { getRaffles, LuckyLensMumbai } from '../lib/contracts/LuckyLens/LuckyLens'
 import RaffleCard from '../components/RaffleCard'
 import VerifyWinner from '../components/VerifyWinner'
-import { NewRaffleData, RaffleData } from '../lib/types'
+import { NewRaffleData, RaffleData } from '../lib/types/types'
 
 
 

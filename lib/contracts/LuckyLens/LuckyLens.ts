@@ -1,8 +1,11 @@
 
 import { BigNumber, Contract, ethers } from 'ethers'
+import { getSyntheticLeadingComments } from 'typescript'
 import { ALCHEMY_KEY_MUMBAI } from '../../../pages/_app'
 import { getPublication } from '../../lensApi/api'
-import { postedRaffleLog } from '../../types'
+import { LuckyLens, LuckyLensInterface } from '../../types/LuckyLens/LuckyLens'
+import { postedRaffleLog, RaffleStruct } from '../../types/types'
+import { getComments } from '../LensHub/LensHub'
 import LuckyLensJson from './LuckyLens.json'
 // abi => api
 
@@ -10,7 +13,7 @@ export const defaultProvider = new ethers.providers.AlchemyProvider('maticmum', 
 
 // exports ethers contract that can be connected to a signer with contract.connect(Signer)
 // in the future can pre-connect to app's provider in here if read-only calls are prevalent in the app
-export const LuckyLensMumbai:Contract = new ethers.Contract("0xFfA634f998F351185719D6C155617091D7AA6167", LuckyLensJson.abi, defaultProvider)
+export const LuckyLensMumbai:Contract = new ethers.Contract("0xFfA634f998F351185719D6C155617091D7AA6167",LuckyLensJson.abi, defaultProvider)
 console.dir(LuckyLensMumbai)
 
 
@@ -56,11 +59,12 @@ export const getQualifiedEntrants = async(raffleId: string, requirements:string)
   // first thing to do is get the raffle data from the contract for the given raffleId
   const totalRaffles = await LuckyLensMumbai.totalRaffles()
   if(parseInt(raffleId) > totalRaffles-1) throw new Error('Raffle does not exist')
-  const raffleData = await LuckyLensMumbai.Raffles(raffleId)
-  const {profileId, pubId} = raffleData
+  const raffleData:postedRaffleLog = await LuckyLensMumbai.Raffles(raffleId)
+  console.log(raffleData)
+  const {profileId, pubId, time: s_time} = raffleData
   
-  // getting all valid comment elogs, will start by trying to plug in event abi to contract and filter for that, but if must, then will do lower level log filtering
-  
+  // using subgraph!
+  const allComments = await getComments(profileId.toString(), pubId.toString(), s_time)
 
   
 

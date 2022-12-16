@@ -21,6 +21,7 @@ export const getProfile = async (address: string):Promise<ProfileFieldsFragment>
 
   const backupRequest:ProfileQueryRequest = {ownedBy: [address]}
   const result = await client.query(ProfilesDocument, {request: backupRequest} ).toPromise()
+  console.log(result)
   console.log(result.data?.profiles.items[0])
   return result.data!.profiles.items[0]
 };
