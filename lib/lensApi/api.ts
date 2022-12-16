@@ -1,7 +1,8 @@
 
 
+import { BigNumber } from 'ethers';
 import { createClient } from 'urql'
-import { DefaultProfileRequest, ProfileQueryRequest, ProfilesDocument, DefaultProfileDocument, Profile, ProfileFieldsFragment } from './generated';
+import { DefaultProfileRequest, ProfileQueryRequest, ProfilesDocument, DefaultProfileDocument, Profile, ProfileFieldsFragment, PublicationDocument, PublicationQueryRequest } from './generated';
 
 
 const API_URL = 'https://api-mumbai.lens.dev'
@@ -23,3 +24,11 @@ export const getProfile = async (address: string):Promise<ProfileFieldsFragment>
   console.log(result.data?.profiles.items[0])
   return result.data!.profiles.items[0]
 };
+
+export const getPublication = async (profileId: BigNumber, pubId: BigNumber):Promise<any> => {
+  const internalPublicationId = `${profileId.toHexString()}-${pubId.toHexString()}`
+  const request:PublicationQueryRequest = {publicationId: internalPublicationId}
+  const result = await client.query(PublicationDocument, {request}).toPromise()
+  console.log(result)
+  return result
+}

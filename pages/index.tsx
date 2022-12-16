@@ -8,25 +8,8 @@ import { BigNumber, ethers } from 'ethers'
 import { getRaffles, LuckyLensMumbai } from '../lib/contracts/LuckyLens'
 import RaffleCard from '../components/RaffleCard'
 import VerifyWinner from '../components/VerifyWinner'
+import { NewRaffleData, RaffleData } from '../lib/types'
 
-
-type NewRaffleData = {
-  profileId?: string,
-  pubId?: string,
-  date?: string,
-  time?: string,
-  now?: boolean
-}
-export type RaffleData = {
-  owner: string,
-  profileId: string,
-  pubId: string,
-  raffleId: string,
-  s_time: number, //time in seconds
-  passed: boolean,
-  date: Date,
-  randomNum: string
-}
 
 
 

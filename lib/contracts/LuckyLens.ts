@@ -1,7 +1,8 @@
 
 import { BigNumber, Contract, ethers } from 'ethers'
-import { RaffleData } from '../../pages'
 import { ALCHEMY_KEY_MUMBAI } from '../../pages/_app'
+import { getPublication } from '../lensApi/api'
+import { postedRaffleLog } from '../types'
 import LuckyLensJson from './LuckyLens.json'
 // abi => api
 
@@ -13,12 +14,14 @@ export const LuckyLensMumbai:Contract = new ethers.Contract("0xFfA634f998F351185
 console.dir(LuckyLensMumbai)
 
 
+
+
 // getting all raffles rn. not filtering for live raffles or anything.
 export const getRaffles = async(address: string):Promise<any[]> => {
 
 const postRaffleFilter = LuckyLensMumbai.filters.PostRaffle(address)
 const postRaffleLogs = await LuckyLensMumbai.queryFilter(postRaffleFilter, -200000, 'latest') //hardcoded -200000 blocks ago to now
-const cleanItUp = postRaffleLogs.map(log => ({owner: log.args?.owner, profileId: log.args?.profileId, pubId: log.args?.pubId, raffleId: log.args?.raffleId, time: log.args?.time}))
+const cleanItUp:postedRaffleLog[] = postRaffleLogs.map(log => ({owner: log.args?.owner, profileId: log.args?.profileId, pubId: log.args?.pubId, raffleId: log.args?.raffleId, time: log.args?.time}))
 const justRaffleIds:BigNumber[] = cleanItUp.map(raffle => raffle.raffleId)
 const randomNums = await LuckyLensMumbai.getRandomNums(justRaffleIds)
 
@@ -51,10 +54,14 @@ return final.reverse() // reverse to show newest first
 
 export const getQualifiedEntrants = async(raffleId: string, requirements:string):Promise<any[]> => {
   // first thing to do is get the raffle data from the contract for the given raffleId
-  // const raffleData = await LuckyLensMumbai.Raffles(raffleId)
-  // const {profileId, pubId} = raffleData
+  const totalRaffles = await LuckyLensMumbai.totalRaffles()
+  if(parseInt(raffleId) > totalRaffles-1) throw new Error('Raffle does not exist')
+  const raffleData = await LuckyLensMumbai.Raffles(raffleId)
+  const {profileId, pubId} = raffleData
   
-  // now we can query the lens api with the profile / pub id to determine 1. who has commented and 2. if they follow the poster
+  // now we can query the lens api with the profile / pub id to determine 1. who has commented and optionally filter if they've followed or not
+  const publication = getPublication(profileId, pubId)
+  
 
 
 
