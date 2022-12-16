@@ -50,6 +50,8 @@ export default function Home() {
     const LuckyLens = LuckyLensMumbai.connect(signer!) // not possible to be null b/c nothing in the app shows up until you connect
     console.dir(LuckyLens)
 
+    const winnerFilter = LuckyLensMumbai.filters.RequestFulfilled()
+    LuckyLensMumbai.once(winnerFilter, () => updateRaffles(address))
     // set handling for state update.
     const postRaffleFilter = LuckyLensMumbai.filters.PostRaffle(address)
     LuckyLensMumbai.once(postRaffleFilter, () => updateRaffles(address))
