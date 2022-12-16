@@ -21,7 +21,7 @@ export type RaffleData = {
   profileId: string,
   pubId: string,
   raffleId: string,
-  time: string,
+  s_time: number, //time in seconds
   passed: boolean,
   date: Date
 }
@@ -52,13 +52,14 @@ export default function Home() {
     LuckyLensMumbai.once(postRaffleFilter, () => updateRaffles(address))
 
 
-    const timeParam = now ? 1 : new Date(date + " " + time).valueOf() // converts to seconds since epoch
-    if(timeParam < Date.now() && timeParam != 1) console.error('invalid time param')
+    const s_timeParam = now ? 1 : new Date(date + " " + time).valueOf()/1000 // converts to seconds since epoch
+    console.log(s_timeParam)
+    if(s_timeParam < Date.now()/1000 && s_timeParam != 1) console.error('invalid time param')
 
     let tx
     try{
     if(now) tx = await LuckyLens.newRaffleDrawNow(profileId, pubId)
-    if(!now) tx = await LuckyLens.postRaffle(profileId, pubId, timeParam)
+    if(!now) tx = await LuckyLens.postRaffle(profileId, pubId, s_timeParam)
     } catch(err) {
       console.log(err)
     }
