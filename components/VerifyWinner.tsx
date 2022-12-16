@@ -9,8 +9,9 @@ const VerifyWinner = () => {
 
   const handleVerify = async () => { 
     if(!raffleId || !checked) return
-    const qualifiedEntrants = getQualifiedEntrants(raffleId, checked)
-    console.log(qualifiedEntrants)
+    // const qualifiedEntrants = await getQualifiedEntrants(raffleId, checked)
+    // console.log(qualifiedEntrants)
+    console.log('verifying winner')
   }
 
 

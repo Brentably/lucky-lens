@@ -9,7 +9,7 @@ export const defaultProvider = new ethers.providers.AlchemyProvider('maticmum', 
 
 // exports ethers contract that can be connected to a signer with contract.connect(Signer)
 // in the future can pre-connect to app's provider in here if read-only calls are prevalent in the app
-export const LuckyLensMumbai:Contract = new ethers.Contract("0x1622E45Ec8297F4195C10A31e1e18c96D434D8C8", LuckyLensJson.abi, defaultProvider)
+export const LuckyLensMumbai:Contract = new ethers.Contract("0xFfA634f998F351185719D6C155617091D7AA6167", LuckyLensJson.abi, defaultProvider)
 console.dir(LuckyLensMumbai)
 
 
@@ -51,8 +51,8 @@ return final.reverse() // reverse to show newest first
 
 export const getQualifiedEntrants = async(raffleId: string, requirements:string):Promise<any[]> => {
   // first thing to do is get the raffle data from the contract for the given raffleId
-  const raffleData = await LuckyLensMumbai.Raffles(raffleId)
-  const {profileId, pubId} = raffleData
+  // const raffleData = await LuckyLensMumbai.Raffles(raffleId)
+  // const {profileId, pubId} = raffleData
   
   // now we can query the lens api with the profile / pub id to determine 1. who has commented and 2. if they follow the poster
 
