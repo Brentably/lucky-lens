@@ -44,7 +44,7 @@ for(let i = 0; i < cleanItUp.length; i++) {
     profileId: profileId.toString(),
     pubId: pubId.toString(),
     raffleId: raffleId.toString(),
-    s_time: s_time.toString(),
+    time: s_time.toString(),
     passed,
     date,
     randomNum: randomNum.toString()
